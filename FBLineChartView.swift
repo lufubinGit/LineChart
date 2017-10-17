@@ -18,7 +18,7 @@ class FBLineChartView: UIView {
     
     var scrollView:PaintScrollView! = PaintScrollView()
     
-    var bottomScroll:UIScrollView!
+    var bottomScroll:UIScrollView = UIScrollView.init()
     
     var currentContentOffset:CGPoint!
     
@@ -42,18 +42,7 @@ class FBLineChartView: UIView {
         self.init()
         self.delegate = delegate
         self.frame = frame
-        /*
-         内边距的比例(与self的高度相比)、 那边距的临界值
-         默认按比例计算， 但是如果比例的值超出了临界值范围，将使用临界值计算
-         */
-        let gapScale:CGFloat = 1/9
-        let maxGapLimit:CGFloat = 50
-        let minGapLimit:CGFloat = 15
-        gap = self.Height*gapScale
-        if gap > maxGapLimit{ gap = maxGapLimit }
-        if gap < minGapLimit{ gap = minGapLimit }
-
-        self.createContentScrollView()
+       
         self.setBackGColor()
         
         delayAction(atime: 0.5) { 
@@ -127,12 +116,16 @@ extension FBLineChartView{
         }
         self.addSubview(scrollView)
         
-        
         //为了可以拖动，做成下栏scrollView
-        bottomScroll = UIScrollView.init(frame: CGRect.init(x: 0, y: self.Height - gap, width: self.Width, height: gap)).then(block: { (scroll) in
+        let frame2:CGRect = CGRect.init(x: 0, y: self.Height - gap, width: self.Width, height: gap)
+        bottomScroll = bottomScroll.then(block: { (scroll) in
+            scroll.frame = frame2
             scroll.contentSize = CGSize.init(width: scrollView.contentSize.width, height: gap)
             scroll.isScrollEnabled = false //禁止手动拖动 ， 只能跟随拖动
         })
+        
+        self.addSubview(bottomScroll)
+
     }
 
     /// 左侧竖直方向的label 最上端展示单位
@@ -143,6 +136,11 @@ extension FBLineChartView{
         }
         self.verLabels.removeAll()
         
+        if self.verUnitLabel != nil{
+            self.verUnitLabel.removeFromSuperview()
+            self.verUnitLabel = nil
+        }
+
         self.verUnitLabel = UILabel.init().then(block: { (label) in
             
             label.frame = CGRect.init(x: gap/2.0, y: 0, width: gap * 3, height: gap)
@@ -194,8 +192,6 @@ extension FBLineChartView{
             self.horLabels.append(horLabel)
             bottomScroll.addSubview(horLabel)
         }
-        
-        self.addSubview(bottomScroll)
     }
 }
 
@@ -205,8 +201,23 @@ extension FBLineChartView{
     
     public func refreshUIData() {
         
+        /*
+         内边距的比例(与self的高度()相比)、 那边距的临界值
+         默认按比例计算， 但是如果比例的值超出了临界值范围，将使用临界值计算
+         */
+        let gapScale:CGFloat = 1/9
+        let maxGapLimit:CGFloat = 50
+        let minGapLimit:CGFloat = 15
+        gap = self.Height*gapScale
+        if gap > maxGapLimit{ gap = maxGapLimit }
+        if gap < minGapLimit{ gap = minGapLimit }
+
+        // 添加两个滚动视图
+        self.createContentScrollView()
+
         //刷新之前  清楚原本有的label和layer
         self.scrollView.clearAllSubview()
+        
         
         //获取数据源
         self.values = delegate.values()

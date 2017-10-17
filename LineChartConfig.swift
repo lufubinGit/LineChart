@@ -34,7 +34,7 @@ let LineChartVerticalGridCount:Int = 3
 let defaultTextFontSize:Int = 9
 
 /// 图表高度和最大高度的比值
-let maxValueScale = 1.2
+let maxValueScale = 1.3
 
 
 

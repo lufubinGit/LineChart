@@ -10,28 +10,55 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    @IBOutlet weak var start: UIImageView!
     var dataSource:[CGFloat] = [CGFloat]()
     var titleSource:[String] = [String]()
+    var v:FBLineChartView! = nil
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+        self.start.layer.borderColor = APPLINECOLOR.cgColor
+        self.start.layer.borderWidth = 1.0
+        
+        
         
         self.dataSource = [645,546,695,654,2666,1954,956,4265]
         self.titleSource = ["6月1号","2","3","4","5","6","7","8"]
         
-        let v:FBLineChartView = FBLineChartView.init(delegate: self)
+        v = FBLineChartView.init(frame: CGRect.init(x: 0, y: 0, width: ScreenWidth, height: 250), delegate: self)
         v.Y = 100
         self.view.addSubview(v)
+        
         
         
         delayAction(atime: 3) {
             
             self.dataSource = [20,56,84,92,41,65,48,62]
-            v.setBackGColor(UIColor.init(RGBA: "#008B8B"))
-            v.setUnitColor(UIColor.red)
-            v.refreshUIData()
+            self.v.setBackGColor(UIColor.init(RGBA: "#008B8B"))
+            self.v.setUnitColor(UIColor.red)
+            self.v.refreshUIData()
         }
-        
     }
+    
+    override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
+        if toInterfaceOrientation == .landscapeLeft||toInterfaceOrientation == .landscapeRight{
+            self.v.Width = ScreenHeight
+            self.v.Height = 250/ScreenHeight*ScreenWidth
+            
+        }else{
+           self.v.Width = ScreenWidth
+            self.v.Height = 250
+        }
+        self.v.refreshUIData()
+
+    }
+    
+    
+    override func didRotate(from fromInterfaceOrientation: UIInterfaceOrientation) {
+        Dlog(item: UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)
+    }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
